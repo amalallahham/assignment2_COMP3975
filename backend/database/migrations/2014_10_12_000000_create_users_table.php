@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('username')->unique();
             $table->string('password');
-            $table->string('firstName');
-            $table->string('lastName');
-            $table->timestamp('registrationDate')->nullable();
-            $table->boolean('isApproved')->default(false);
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->timestamp('registration_date')->nullable();
+            $table->boolean('is_approved')->default(false);
             $table->enum('role', ['Admin', 'Contributor'])->default('Contributor');
             $table->rememberToken();
             $table->timestamps();

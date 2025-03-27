@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -20,9 +19,10 @@ class User extends Authenticatable
     protected $fillable = [
         'username',
         'password',
-        'firstName',
-        'lastName',
-        'isApproved',
+        'first_name',   // fixed: from firstName
+        'last_name',    // fixed: from lastName
+        'registration_date',
+        'is_approved',
         'role',
     ];
 
@@ -42,19 +42,27 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'isApproved' => 'boolean',
+        'is_approved' => 'boolean',
+        'registration_date' => 'datetime',
         'password' => 'hashed',
     ];
 
+    /**
+     * Default attribute values.
+     */
     protected $attributes = [
-        'isApproved' => false,
+        'is_approved' => false,
+        'role' => self::ROLE_CONTRIBUTOR,
     ];
 
     const ROLE_ADMIN = 'Admin';
     const ROLE_CONTRIBUTOR = 'Contributor';
 
-    protected $dates = [
-        'created_at',
-        'updated_at',
-    ];
+    /**
+     * Override to use 'username' instead of 'email' for login
+     */
+    public function getAuthIdentifierName()
+    {
+        return 'username';
+    }
 }
