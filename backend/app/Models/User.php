@@ -24,6 +24,7 @@ class User extends Authenticatable
         'registration_date',
         'is_approved',
         'role',
+
     ];
 
     /**
@@ -64,5 +65,10 @@ class User extends Authenticatable
     public function getAuthIdentifierName()
     {
         return 'username';
+    }
+
+    public function getEmailForPasswordReset()
+    {
+        return $this->username;
     }
 }

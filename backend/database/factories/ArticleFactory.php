@@ -1,20 +1,11 @@
 <?php
-
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Articles>
- */
 class ArticleFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-
     public function definition(): array
     {
         return [
@@ -24,10 +15,10 @@ class ArticleFactory extends Factory
             'start_date' => $this->faker->date(),
             'end_date' => $this->faker->date(),
             'contributor_username' => function () {
-                return \App\Models\User::factory()->create([
+                return User::factory()->create([
                     'role' => 'Contributor',
                     'is_approved' => true,
-                ])->email;
+                ])->username;
             },
         ];
     }

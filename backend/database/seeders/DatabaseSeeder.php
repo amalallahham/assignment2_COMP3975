@@ -37,6 +37,9 @@ class DatabaseSeeder extends Seeder
             'is_approved' => true,             
             'role' => 'Contributor',
         ]);
+
+        $this->call(ArticleSeeder::class);
+
         
     }
 }

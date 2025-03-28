@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+.img-logo {
+    width: 100px !important;
+    height: 100px !important;
+}
+
+
+.img-logo-b {
+    width: 150px ;
+    height: 150px ;
+}
