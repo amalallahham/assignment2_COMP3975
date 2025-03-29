@@ -4,16 +4,18 @@ import axios from "axios";
 const Articles = () => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     axios
       .get("http://localhost:8000/api/articles")
       .then((response) => {
-        setArticles(response.data);
+        setArticles(response.data.data);
         setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching articles:", error);
+        setError(error.message);
         setLoading(false);
       });
   }, []);
@@ -21,8 +23,15 @@ const Articles = () => {
   if (loading)
     return (
       <div className="flex justify-center items-center min-h-[200px]">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-indigo-500"></div>
-    </div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-indigo-500"></div>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="flex justify-center items-center min-h-[200px]">
+        <p className="text-red-500">Error loading articles: {error}</p>
+      </div>
     );
 
   return (
@@ -44,7 +53,7 @@ const Articles = () => {
                     {article.title}
                   </h2>
                   <p className="text-sm text-gray-500 mb-4">
-                    Created on: {article.create_date}
+                    Created on: {new Date(article.create_date).toLocaleDateString()}
                   </p>
                   <div
                     className="text-gray-700 prose max-w-none"
