@@ -20,5 +20,11 @@ class Article extends Model
         'contributor_username',
     ];
 
+    protected $casts = [
+        'create_date' => 'datetime',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+    ];
+
     public $timestamps = true;
 }

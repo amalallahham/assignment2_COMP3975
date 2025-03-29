@@ -1,66 +1,124 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Admin') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <h1 class="text-2xl font-bold mb-6 text-gray-800">Users</h1>
+@section('content')
+<div class="container">
+    <h1 class="mb-4">Admin Dashboard</h1>
 
-        @if (session('success'))
-            <div class="mb-4 p-4 rounded bg-green-100 text-green-800 border border-green-200">
-                {{ session('success') }}
-            </div>
-        @endif
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
-        <div class="overflow-x-auto bg-white shadow rounded">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Username</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Approved</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Role</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    @foreach ($users as $user)
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">User Management</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
                         <tr>
-                            <td class="px-4 py-2 text-sm text-gray-800">{{ $user->username }}</td>
-                            <td class="px-4 py-2 text-sm">
-                                @if ($user->is_approved)
-                                    <span class="inline-block px-2 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded">Yes</span>
-                                @else
-                                    <span class="inline-block px-2 py-1 text-xs font-semibold bg-red-100 text-red-600 rounded">No</span>
-                                @endif
-                            </td>
-                            <td class="px-4 py-2 text-sm text-gray-700">{{ $user->role }}</td>
-                            <td class="px-4 py-2 space-x-2">
-                                @if ($user->role !== 'Admin')
-                                    @if (! $user->is_approved)
-                                        <form action="{{ route('admin.approve', $user->id) }}" method="POST" class="inline">
-                                            @csrf
-                                            <button type="submit"
-                                                class="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-sm rounded">Approve</button>
-                                        </form>
-                                    @endif
-                
-                                    @if ($user->role === 'Contributor')
-                                        <form action="{{ route('admin.promote', $user->id) }}" method="POST" class="inline">
-                                            @csrf
-                                            <button type="submit"
-                                                class="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white text-sm rounded">Promote</button>
-                                        </form>
-                                    @endif
-                                @endif
-                            </td>
+                            <th>Username</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Registration Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
-                    @endforeach
-                </tbody>
-                
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($users as $user)
+                            <tr>
+                                <td>{{ $user->username }}</td>
+                                <td>{{ $user->first_name }} {{ $user->last_name }}</td>
+                                <td>
+                                    <span class="badge {{ $user->role === 'Admin' ? 'bg-danger' : 'bg-primary' }}">
+                                        {{ $user->role }}
+                                    </span>
+                                </td>
+                                <td>
+                                    @if($user->registration_date)
+                                        {{ $user->registration_date->format('M d, Y') }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+                                <td>
+                                    <span class="badge {{ $user->is_approved ? 'bg-success' : 'bg-warning' }}">
+                                        {{ $user->is_approved ? 'Approved' : 'Pending' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        @if(!$user->is_approved)
+                                            <form action="{{ route('admin.approve', $user->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    Approve
+                                                </button>
+                                            </form>
+                                        @endif
+                                        
+                                        @if($user->role !== 'Admin')
+                                            <form action="{{ route('admin.promote', $user->id) }}" method="POST" class="d-inline ms-1">
+                                                @csrf
+                                                <button type="submit" class="btn btn-warning btn-sm">
+                                                    Promote to Admin
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-</x-app-layout>
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0">Site Statistics</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h6 class="card-title">Total Users</h6>
+                            <h2 class="card-text">{{ $users->count() }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <h6 class="card-title">Approved Users</h6>
+                            <h2 class="card-text">{{ $users->where('is_approved', true)->count() }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-dark">
+                        <div class="card-body">
+                            <h6 class="card-title">Pending Approvals</h6>
+                            <h2 class="card-text">{{ $users->where('is_approved', false)->count() }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-danger text-white">
+                        <div class="card-body">
+                            <h6 class="card-title">Admin Users</h6>
+                            <h2 class="card-text">{{ $users->where('role', 'Admin')->count() }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

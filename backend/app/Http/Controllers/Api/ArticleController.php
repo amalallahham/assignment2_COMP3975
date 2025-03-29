@@ -6,12 +6,24 @@ use App\Http\Controllers\Controller;
 use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class ArticleController extends Controller
 {
     public function index()
     {
-        return response()->json(Article::all());
+        $today = Carbon::today();
+        
+        // Only return articles that are currently valid (within start and end dates)
+        $articles = Article::where(function($query) use ($today) {
+            $query->where('start_date', '<=', $today)
+                  ->where('end_date', '>=', $today);
+        })->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $articles
+        ]);
     }
 
     public function store(Request $request)
@@ -19,13 +31,16 @@ class ArticleController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'body' => 'required|string',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after:start_date',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
             'contributor_username' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
         $article = Article::create([
@@ -37,7 +52,10 @@ class ArticleController extends Controller
             'contributor_username' => $request->contributor_username,
         ]);
 
-        return response()->json($article, 201);
+        return response()->json([
+            'status' => 'success',
+            'data' => $article
+        ], 201);
     }
 
     public function show($id)
@@ -45,10 +63,25 @@ class ArticleController extends Controller
         $article = Article::find($id);
         
         if (!$article) {
-            return response()->json(['message' => 'Article not found'], 404);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Article not found'
+            ], 404);
         }
 
-        return response()->json($article);
+        // Check if article is currently valid
+        $today = Carbon::today();
+        if ($today->lt($article->start_date) || $today->gt($article->end_date)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Article is not currently available'
+            ], 403);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $article
+        ]);
     }
 
     public function update(Request $request, $id)
@@ -56,23 +89,33 @@ class ArticleController extends Controller
         $article = Article::find($id);
         
         if (!$article) {
-            return response()->json(['message' => 'Article not found'], 404);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Article not found'
+            ], 404);
         }
 
         $validator = Validator::make($request->all(), [
             'title' => 'sometimes|required|string|max:255',
             'body' => 'sometimes|required|string',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after:start_date',
+            'start_date' => 'sometimes|required|date',
+            'end_date' => 'sometimes|required|date|after:start_date',
             'contributor_username' => 'sometimes|required|string|max:255',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
         $article->update($request->all());
-        return response()->json($article);
+        
+        return response()->json([
+            'status' => 'success',
+            'data' => $article
+        ]);
     }
 
     public function destroy($id)
@@ -80,10 +123,17 @@ class ArticleController extends Controller
         $article = Article::find($id);
         
         if (!$article) {
-            return response()->json(['message' => 'Article not found'], 404);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Article not found'
+            ], 404);
         }
 
         $article->delete();
-        return response()->json(['message' => 'Article deleted successfully']);
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Article deleted successfully'
+        ]);
     }
 }

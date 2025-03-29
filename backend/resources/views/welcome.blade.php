@@ -1,17 +1,32 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Blog') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    {{ __("You're logged in!") }}
+@section('content')
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Welcome to Laravel Blog</h2>
+                </div>
+                <div class="card-body">
+                    @auth
+                        <p>You're logged in! Check out our latest articles or create your own.</p>
+                        <div class="mt-4">
+                            <a href="{{ route('articles.index') }}" class="btn btn-primary">View Articles</a>
+                            @if(Auth::user()->is_approved)
+                                <a href="{{ route('articles.create') }}" class="btn btn-success">Create Article</a>
+                            @endif
+                        </div>
+                    @else
+                        <p>Please login or register to access all features.</p>
+                        <div class="mt-4">
+                            <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
+                            <a href="{{ route('register') }}" class="btn btn-success">Register</a>
+                        </div>
+                    @endauth
                 </div>
             </div>
         </div>
     </div>
-</x-app-layout>
+</div>
+@endsection
