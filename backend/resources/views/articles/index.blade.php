@@ -1,84 +1,86 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Articles') }}
+        </h2>
+    </x-slot>
 
-@section('content')
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Articles</h1>
-        <div>
-            @guest
-                <a href="{{ route('login') }}" class="btn btn-outline-primary me-2">Login</a>
-                <a href="{{ route('register') }}" class="btn btn-primary">Register to Contribute</a>
-            @else
-                @can('create', App\Models\Article::class)
-                    <a href="{{ route('articles.create') }}" class="btn btn-primary">
-                        Create New Article
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">All Articles</h1>
+            <div>
+                @guest
+                    <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 mr-2">
+                        Login
                     </a>
-                @endcan
-            @endguest
+                    <a href="{{ route('register') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                        Register to Contribute
+                    </a>
+                @else
+                    @can('create', App\Models\Article::class)
+                        <a href="{{ route('articles.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                            Create New Article
+                        </a>
+                    @endcan
+                @endguest
+            </div>
         </div>
-    </div>
 
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
+        @if(session('success'))
+            <div class="mb-4 p-4 rounded bg-green-100 text-green-800 border border-green-200">
+                {{ session('success') }}
+            </div>
+        @endif
 
-    @if($articles->isEmpty())
-        <div class="alert alert-info">
-            No articles found.
-        </div>
-    @else
-        <div class="row">
-            @foreach($articles as $article)
-                <div class="col-md-6 mb-4">
-                    <div class="card h-100 {{ isset($article->is_expired) ? 'bg-light' : '' }}">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $article->title }}</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">
-                                By {{ $article->contributor_username }}
-                            </h6>
-                            @if(isset($article->is_expired))
-                                @php
-                                    $now = \Carbon\Carbon::now();
-                                    $status = $article->end_date < $now ? 'Expired' : 'Upcoming';
-                                @endphp
-                                <div class="badge bg-secondary mb-2">{{ $status }}</div>
-                            @endif
-                            <p class="card-text">
-                                {{ Str::limit(strip_tags($article->body), 150) }}
-                            </p>
-                            <div class="text-muted small mb-3">
-                                <div>Created: {{ $article->create_date->format('M d, Y') }}</div>
-                                <div>Active Period: {{ $article->start_date->format('M d, Y') }} - {{ $article->end_date->format('M d, Y') }}</div>
+        @if($articles->isEmpty())
+            <div class="text-center py-12 bg-white shadow rounded">
+                <p class="text-gray-500">No articles found.</p>
+            </div>
+        @else
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                @foreach($articles as $article)
+                    <div class="bg-white shadow rounded-lg overflow-hidden {{ isset($article->is_expired) && $article->is_expired ? 'opacity-75' : '' }}">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h2 class="text-xl font-semibold text-gray-800">{{ $article->title }}</h2>
+                                @if(isset($article->is_expired) && $article->is_expired)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        Expired
+                                    </span>
+                                @endif
                             </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                @if(!isset($article->is_expired))
-                                    <a href="{{ route('articles.show', $article) }}" class="btn btn-primary btn-sm">
-                                        View Details
+                            <p class="text-gray-600 mb-4 line-clamp-3">{{ strip_tags($article->body) }}</p>
+                            <div class="text-sm text-gray-500 mb-4">
+                                <p>By {{ $article->contributor_username }}</p>
+                                <p>Active Period: {{ $article->start_date->format('M d, Y') }} - {{ $article->end_date->format('M d, Y') }}</p>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                @if($article->isActive())
+                                    <a href="{{ route('articles.show', $article) }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                                        Read More
                                     </a>
                                 @endif
-                                @can('update', $article)
-                                    <div class="btn-group">
-                                        <a href="{{ route('articles.edit', $article) }}" class="btn btn-warning btn-sm">
-                                            Edit
-                                        </a>
-                                        <form action="{{ route('articles.destroy', $article) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this article?')">
-                                                Delete
-                                            </button>
-                                        </form>
-                                    </div>
-                                @endcan
+                                @auth
+                                    @can('update', $article)
+                                        <div class="flex space-x-2">
+                                            <a href="{{ route('articles.edit', $article) }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                                Edit
+                                            </a>
+                                            <form action="{{ route('articles.destroy', $article) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700" onclick="return confirm('Are you sure you want to delete this article?')">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @endcan
+                                @endauth
                             </div>
                         </div>
                     </div>
-                </div>
-            @endforeach
-        </div>
-    @endif
-</div>
-@endsection 
+                @endforeach
+            </div>
+        @endif
+    </div>
+</x-app-layout> 

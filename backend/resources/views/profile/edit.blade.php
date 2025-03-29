@@ -1,29 +1,32 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
-                </div>
+@section('content')
+<div class="max-w-2xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Profile</h1>
+        <a href="{{ route('articles.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Back to Articles
+        </a>
+    </div>
+
+    <div class="space-y-6">
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <div class="max-w-xl">
+                @include('profile.partials.update-profile-information-form')
             </div>
+        </div>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
-                </div>
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <div class="max-w-xl">
+                @include('profile.partials.update-password-form')
             </div>
+        </div>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
-                </div>
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <div class="max-w-xl">
+                @include('profile.partials.delete-user-form')
             </div>
         </div>
     </div>
-</x-app-layout>
+</div>
+@endsection

@@ -6,8 +6,11 @@ use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
+use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
 {
@@ -28,8 +31,8 @@ class ProfileController extends Controller
     {
         $request->user()->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($request->user()->isDirty('username')) {
+            $request->user()->username_verified_at = null;
         }
 
         $request->user()->save();
@@ -38,16 +41,43 @@ class ProfileController extends Controller
     }
 
     /**
+     * Update the user's password.
+     */
+    public function updatePassword(Request $request): RedirectResponse
+    {
+        try {
+            $validated = $request->validate([
+                'current_password' => ['required', 'current_password'],
+                'password' => ['required', 'confirmed', Password::defaults()],
+            ]);
+
+            $request->user()->update([
+                'password' => Hash::make($validated['password']),
+            ]);
+
+            return Redirect::route('profile.edit')
+                ->with('success', 'Your password has been updated successfully. Please use your new password for your next login.');
+        } catch (ValidationException $e) {
+            return Redirect::route('profile.edit')
+                ->withErrors($e->errors())
+                ->withInput();
+        } catch (\Exception $e) {
+            return Redirect::route('profile.edit')
+                ->with('error', 'An unexpected error occurred while updating your password. Please try again.')
+                ->withInput();
+        }
+    }
+
+    /**
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validateWithBag('userDeletion', [
+        $request->validate([
             'password' => ['required', 'current_password'],
         ]);
 
         $user = $request->user();
-
         Auth::logout();
 
         $user->delete();
@@ -55,6 +85,6 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return Redirect::to('/login');
+        return Redirect::to('/');
     }
 }

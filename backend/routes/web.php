@@ -8,7 +8,6 @@ use App\Http\Controllers\ArticleController;
 // Public routes
 Route::get('/', [ArticleController::class, 'index'])->name('home');
 Route::get('/articles', [ArticleController::class, 'index'])->name('articles.index');
-Route::get('/articles/{article}', [ArticleController::class, 'show'])->name('articles.show');
 
 // Protected routes that require login and approval
 Route::middleware(['auth', 'approved'])->group(function () {
@@ -18,6 +17,9 @@ Route::middleware(['auth', 'approved'])->group(function () {
     Route::put('/articles/{article}', [ArticleController::class, 'update'])->name('articles.update');
     Route::delete('/articles/{article}', [ArticleController::class, 'destroy'])->name('articles.destroy');
 });
+
+// Public article show route
+Route::get('/articles/{article}', [ArticleController::class, 'show'])->name('articles.show');
 
 // Admin-only routes
 Route::middleware(['auth', 'is_admin'])->prefix('admin')->group(function () {

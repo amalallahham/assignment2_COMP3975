@@ -1,66 +1,62 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Create New Article</h5>
+<div class="max-w-2xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Create New Article</h1>
+        <a href="{{ route('articles.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Back to Articles
+        </a>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <form action="{{ route('articles.store') }}" method="POST">
+            @csrf
+            
+            <div class="mb-6">
+                <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <input type="text" name="title" id="title" value="{{ old('title') }}" required
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('title') border-red-500 @enderror">
+                @error('title')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-6">
+                <label for="body" class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                <textarea name="body" id="body" rows="10" required
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('body') border-red-500 @enderror">{{ old('body') }}</textarea>
+                @error('body')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                    <input type="date" name="start_date" id="start_date" value="{{ old('start_date') }}" required
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('start_date') border-red-500 @enderror">
+                    @error('start_date')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
-                <div class="card-body">
-                    <form action="{{ route('articles.store') }}" method="POST">
-                        @csrf
 
-                        <div class="mb-3">
-                            <label for="title" class="form-label">Title</label>
-                            <input type="text" class="form-control @error('title') is-invalid @enderror" 
-                                id="title" name="title" value="{{ old('title') }}" required>
-                            @error('title')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="body" class="form-label">Content</label>
-                            <textarea class="form-control @error('body') is-invalid @enderror" 
-                                id="body" name="body" rows="10" required>{{ old('body') }}</textarea>
-                            @error('body')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="start_date" class="form-label">Start Date</label>
-                                    <input type="date" class="form-control @error('start_date') is-invalid @enderror" 
-                                        id="start_date" name="start_date" value="{{ old('start_date') }}" required>
-                                    @error('start_date')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="end_date" class="form-label">End Date</label>
-                                    <input type="date" class="form-control @error('end_date') is-invalid @enderror" 
-                                        id="end_date" name="end_date" value="{{ old('end_date') }}" required>
-                                    @error('end_date')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ route('articles.index') }}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Create Article</button>
-                        </div>
-                    </form>
+                <div>
+                    <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                    <input type="date" name="end_date" id="end_date" value="{{ old('end_date') }}" required
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('end_date') border-red-500 @enderror">
+                    @error('end_date')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
-        </div>
+
+            <div class="flex justify-end">
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Create Article
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection

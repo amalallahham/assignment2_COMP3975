@@ -27,4 +27,10 @@ class Article extends Model
     ];
 
     public $timestamps = true;
+
+    public function isActive()
+    {
+        $now = now();
+        return $this->start_date <= $now && $this->end_date >= $now;
+    }
 }

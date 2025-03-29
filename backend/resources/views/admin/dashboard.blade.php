@@ -1,123 +1,71 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h1 class="mb-4">Admin Dashboard</h1>
-
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">User Management</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Username</th>
-                            <th>Name</th>
-                            <th>Role</th>
-                            <th>Registration Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($users as $user)
-                            <tr>
-                                <td>{{ $user->username }}</td>
-                                <td>{{ $user->first_name }} {{ $user->last_name }}</td>
-                                <td>
-                                    <span class="badge {{ $user->role === 'Admin' ? 'bg-danger' : 'bg-primary' }}">
-                                        {{ $user->role }}
-                                    </span>
-                                </td>
-                                <td>
-                                    @if($user->registration_date)
-                                        {{ $user->registration_date->format('M d, Y') }}
-                                    @else
-                                        N/A
-                                    @endif
-                                </td>
-                                <td>
-                                    <span class="badge {{ $user->is_approved ? 'bg-success' : 'bg-warning' }}">
-                                        {{ $user->is_approved ? 'Approved' : 'Pending' }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="btn-group" role="group">
-                                        @if(!$user->is_approved)
-                                            <form action="{{ route('admin.approve', $user->id) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-success btn-sm">
-                                                    Approve
-                                                </button>
-                                            </form>
-                                        @endif
-                                        
-                                        @if($user->role !== 'Admin')
-                                            <form action="{{ route('admin.promote', $user->id) }}" method="POST" class="d-inline ms-1">
-                                                @csrf
-                                                <button type="submit" class="btn btn-warning btn-sm">
-                                                    Promote to Admin
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<div class="max-w-7xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
     </div>
 
-    <div class="card mt-4">
-        <div class="card-header">
-            <h5 class="mb-0">Site Statistics</h5>
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="px-4 py-5 sm:px-6">
+            <h2 class="text-xl font-semibold text-gray-900">Registered Users</h2>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="card bg-primary text-white">
-                        <div class="card-body">
-                            <h6 class="card-title">Total Users</h6>
-                            <h2 class="card-text">{{ $users->count() }}</h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-success text-white">
-                        <div class="card-body">
-                            <h6 class="card-title">Approved Users</h6>
-                            <h2 class="card-text">{{ $users->where('is_approved', true)->count() }}</h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-warning text-dark">
-                        <div class="card-body">
-                            <h6 class="card-title">Pending Approvals</h6>
-                            <h2 class="card-text">{{ $users->where('is_approved', false)->count() }}</h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-danger text-white">
-                        <div class="card-body">
-                            <h6 class="card-title">Admin Users</h6>
-                            <h2 class="card-text">{{ $users->where('role', 'Admin')->count() }}</h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="border-t border-gray-200">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registration Date</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach($users as $user)
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ $user->first_name }} {{ $user->last_name }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ $user->email }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ $user->username }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $user->role === 'Admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800' }}">
+                                    {{ $user->role }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $user->is_approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                    {{ $user->is_approved ? 'Approved' : 'Pending' }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $user->registration_date ? $user->registration_date->format('M d, Y') : 'N/A' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                @if(!$user->is_approved)
+                                    <form action="{{ route('admin.approve', $user->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="text-indigo-600 hover:text-indigo-900 mr-3">Approve</button>
+                                    </form>
+                                @endif
+                                @if($user->role !== 'Admin')
+                                    <form action="{{ route('admin.promote', $user->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="text-purple-600 hover:text-purple-900">Promote to Admin</button>
+                                    </form>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

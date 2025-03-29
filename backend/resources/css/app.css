@@ -2,13 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-
+/* Custom styles */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.content {
+    flex: 1;
+}
+footer {
+    margin-top: auto;
+    padding: 20px 0;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
 
 .img-logo {
     width: 100px !important;
     height: 100px !important;
 }
-
 
 .img-logo-b {
     width: 150px ;
