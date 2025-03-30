@@ -17,7 +17,16 @@ class ArticleSeeder extends Seeder
 
             Article::create([
                 'title' => 'Sample Article ' . $i,
-                'body' => Str::random(200),
+                'body' => "
+                    <h2>Heading for Article $i</h2>
+                    <p>This is a <strong>sample article</strong> body with some <em>HTML formatting</em>.</p>
+                    <ul>
+                        <li>First point</li>
+                        <li>Second point</li>
+                        <li>Third point</li>
+                    </ul>
+                    <p>More content to make this article look real.</p>
+                ",
                 'create_date' => Carbon::now(),
                 'start_date' => $start,
                 'end_date' => $end,
