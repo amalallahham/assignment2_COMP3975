@@ -14,8 +14,8 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
+    <body class="font-sans antialiased flex flex-col min-h-screen">
+        <div class="flex flex-col flex-grow bg-gray-100">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
@@ -28,9 +28,18 @@
             @endisset
 
             <!-- Page Content -->
-            <main>
+            <main class="flex-grow">
                 {{ $slot }}
             </main>
+
+            <!-- Footer -->
+            <footer class="bg-white shadow mt-auto">
+                <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+                    <div class="text-center text-gray-600">
+                        <p class="text-sm">COMP3975 Assignment 2 - Team Members: Amal Allaham, Jeffery M Joseph</p>
+                    </div>
+                </div>
+            </footer>
         </div>
     </body>
 </html>
