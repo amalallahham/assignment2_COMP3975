@@ -18,31 +18,23 @@ class ArticleController extends Controller
     public function index()
     {
         $now = Carbon::now();
-    
-        // Active articles
-        $articles = Article::where('start_date', '<=', $now)
-                         ->where('end_date', '>=', $now)
-                         ->get();
-    
-        // Add personal expired articles for logged-in approved users or admins
-        if (Auth::check() && (Auth::user()->role === 'Admin' || Auth::user()->is_approved)) {
-            $personalArticles = Article::where('contributor_username', Auth::user()->username)
-                                    ->whereNotIn('article_id', $articles->pluck('article_id'))
-                                    ->get()
-                                    ->map(function ($article) {
-                                        $article->is_expired = true;
-                                        return $article;
-                                    });
-    
-            // Merge and sort by latest create_date
-            $articles = $articles->concat($personalArticles)->sortByDesc('create_date')->values();
-        } else {
-            $articles = $articles->sortByDesc('create_date')->values();
-        }
-    
+
+        // Get all articles
+        $articles = Article::all()->map(function ($article) use ($now) {
+            // Add an "is_expired" flag to each article
+            $article->is_expired = $article->end_date < $now;
+            return $article;
+        });
+
+        $articles = $articles->sortBy([
+            fn($a, $b) => ($a->is_expired <=> $b->is_expired),
+            fn($a, $b) => $b->create_date <=> $a->create_date,
+        ])->values();
+
+
         return view('articles.index', compact('articles'));
     }
-    
+
 
     public function create()
     {
@@ -72,7 +64,7 @@ class ArticleController extends Controller
         $now = Carbon::now();
         $isActive = $article->start_date <= $now && $article->end_date >= $now;
         $isOwner = Auth::check() && (
-            Auth::user()->role === 'Admin' || 
+            Auth::user()->role === 'Admin' ||
             Auth::user()->username === $article->contributor_username
         );
 
@@ -110,10 +102,10 @@ class ArticleController extends Controller
     public function destroy(Article $article)
     {
         $this->authorize('delete', $article);
-        
+
         $article->delete();
 
         return redirect()->route('articles.index')
             ->with('success', 'Article deleted successfully.');
     }
-} 
+}
