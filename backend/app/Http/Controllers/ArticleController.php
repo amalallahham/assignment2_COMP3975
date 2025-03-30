@@ -18,27 +18,31 @@ class ArticleController extends Controller
     public function index()
     {
         $now = Carbon::now();
+    
+        // Active articles
         $articles = Article::where('start_date', '<=', $now)
                          ->where('end_date', '>=', $now)
-                         ->latest()
                          ->get();
-
-        // For authenticated users (admins and article owners), also show their own articles
+    
+        // Add personal expired articles for logged-in approved users or admins
         if (Auth::check() && (Auth::user()->role === 'Admin' || Auth::user()->is_approved)) {
             $personalArticles = Article::where('contributor_username', Auth::user()->username)
                                     ->whereNotIn('article_id', $articles->pluck('article_id'))
-                                    ->latest()
                                     ->get()
                                     ->map(function ($article) {
                                         $article->is_expired = true;
                                         return $article;
                                     });
-            
-            $articles = $articles->concat($personalArticles);
+    
+            // Merge and sort by latest create_date
+            $articles = $articles->concat($personalArticles)->sortByDesc('create_date')->values();
+        } else {
+            $articles = $articles->sortByDesc('create_date')->values();
         }
-
+    
         return view('articles.index', compact('articles'));
     }
+    
 
     public function create()
     {

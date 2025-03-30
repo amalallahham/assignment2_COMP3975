@@ -12,13 +12,11 @@ class ArticleController extends Controller
 {
     public function index()
     {
-        $today = Carbon::today();
-        
-        // Only return articles that are currently valid (within start and end dates)
-        $articles = Article::where(function($query) use ($today) {
-            $query->where('start_date', '<=', $today)
-                  ->where('end_date', '>=', $today);
-        })->get();
+        $now = Carbon::now();
+
+        $articles = Article::where('end_date', '>=', $now)
+            ->orderBy('start_date', 'asc')
+            ->get();
 
         return response()->json([
             'status' => 'success',
@@ -61,7 +59,7 @@ class ArticleController extends Controller
     public function show($id)
     {
         $article = Article::find($id);
-        
+
         if (!$article) {
             return response()->json([
                 'status' => 'error',
@@ -87,7 +85,7 @@ class ArticleController extends Controller
     public function update(Request $request, $id)
     {
         $article = Article::find($id);
-        
+
         if (!$article) {
             return response()->json([
                 'status' => 'error',
@@ -111,7 +109,7 @@ class ArticleController extends Controller
         }
 
         $article->update($request->all());
-        
+
         return response()->json([
             'status' => 'success',
             'data' => $article
@@ -121,7 +119,7 @@ class ArticleController extends Controller
     public function destroy($id)
     {
         $article = Article::find($id);
-        
+
         if (!$article) {
             return response()->json([
                 'status' => 'error',
@@ -130,7 +128,7 @@ class ArticleController extends Controller
         }
 
         $article->delete();
-        
+
         return response()->json([
             'status' => 'success',
             'message' => 'Article deleted successfully'

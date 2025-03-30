@@ -56,7 +56,7 @@ const Articles = () => {
                     Created on: {new Date(article.create_date).toLocaleDateString()}
                   </p>
                   <div
-                    className="text-gray-700 prose max-w-none"
+                    className="text-gray-700 prose max-w-none word-break"
                     dangerouslySetInnerHTML={{ __html: article.body }}
                   />
                 </div>
