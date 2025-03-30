@@ -60,7 +60,7 @@
 
                 @guest
                     <div class="flex space-x-4">
-                        <a href="{{ route('login') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800">Login</a>
+                        <a href="{{ route('login') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800 px-4 py-2 rounded">Login</a>
                         <a href="{{ route('register') }}" class="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">Register</a>
                     </div>
                 @endguest
